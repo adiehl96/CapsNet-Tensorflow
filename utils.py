@@ -2,6 +2,7 @@ import os
 import scipy
 import numpy as np
 import tensorflow as tf
+import pickle
 
 
 def load_mnist(batch_size, is_training=True):
@@ -72,11 +73,38 @@ def load_fashion_mnist(batch_size, is_training=True):
         return teX / 255., teY, num_te_batch
 
 
+def load_face_set(batch_size, is_training=True):
+    path = os.path.join('data', 'faceSet')
+    if is_training:
+        fd = open(os.path.join(path, 'imgset'), 'rb')
+        # loaded = np.fromfile(file=fd, dtype=np.uint8)
+        loaded = pickle.load(fd)
+        trainX = loaded.reshape((57575, 86, 86, 3)).astype(np.float32)
+
+        fd = open(os.path.join(path, 'categories'), 'rb')
+        # loaded = np.fromfile(file=fd, dtype=np.uint8)
+        loaded = pickle.load(fd)
+        trainY = loaded.reshape((57575)).astype(np.int32)
+
+        trX = trainX[:52000] / 255.
+        trY = trainY[:52000]
+
+        valX = trainX[52000:, ] / 255.
+        valY = trainY[52000:]
+
+        num_tr_batch = 52000 // batch_size
+        num_val_batch = 5575 // batch_size
+
+        return trX, trY, num_tr_batch, valX, valY, num_val_batch
+
+
 def load_data(dataset, batch_size, is_training=True, one_hot=False):
     if dataset == 'mnist':
         return load_mnist(batch_size, is_training)
     elif dataset == 'fashion-mnist':
         return load_fashion_mnist(batch_size, is_training)
+    elif dataset == 'faceset':
+        return load_face_set(batch_size, is_training)
     else:
         raise Exception('Invalid dataset, please check the name of dataset:', dataset)
 
@@ -84,6 +112,8 @@ def load_data(dataset, batch_size, is_training=True, one_hot=False):
 def get_batch_data(dataset, batch_size, num_threads):
     if dataset == 'mnist':
         trX, trY, num_tr_batch, valX, valY, num_val_batch = load_mnist(batch_size, is_training=True)
+    if dataset == 'faceset':
+        trX, trY, num_tr_batch, valX, valY, num_val_batch = load_face_set(batch_size, is_training=True)
     elif dataset == 'fashion-mnist':
         trX, trY, num_tr_batch, valX, valY, num_val_batch = load_fashion_mnist(batch_size, is_training=True)
     data_queues = tf.train.slice_input_producer([trX, trY])

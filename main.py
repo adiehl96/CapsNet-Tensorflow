@@ -47,6 +47,7 @@ def train(model, supervisor, num_label):
     fd_train_acc, fd_loss, fd_val_acc = save_to()
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
+
     with supervisor.managed_session(config=config) as sess:
         print("\nNote: all of results will be saved to directory: " + cfg.results)
         for epoch in range(cfg.epoch):
@@ -93,7 +94,12 @@ def train(model, supervisor, num_label):
 def evaluation(model, supervisor, num_label):
     teX, teY, num_te_batch = load_data(cfg.dataset, cfg.batch_size, is_training=False)
     fd_test_acc = save_to()
-    with supervisor.managed_session(config=tf.ConfigProto(allow_soft_placement=True)) as sess:
+    config = tf.ConfigProto(
+        allow_soft_placement=True,
+        device_count={'GPU': 0}
+    )
+    config.gpu_options.allow_growth = True
+    with supervisor.managed_session(config=config) as sess:
         supervisor.saver.restore(sess, tf.train.latest_checkpoint(cfg.logdir))
         tf.logging.info('Model restored!')
 
@@ -112,7 +118,7 @@ def evaluation(model, supervisor, num_label):
 def main(_):
     tf.logging.info(' Loading Graph...')
     num_label = 10
-    model = CapsNet()
+    model = CapsNet(height=86, width=86, channels=3, num_label=2)
     tf.logging.info(' Graph loaded')
 
     sv = tf.train.Supervisor(graph=model.graph, logdir=cfg.logdir, save_model_secs=0)
