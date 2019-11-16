@@ -2,3 +2,8 @@
 data*
 .ropeproject
 logdir*
+.idea
+FacesInTheWild.mat
+outfile
+nonfacefile
+nonfaceIds
