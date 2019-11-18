@@ -119,7 +119,7 @@ def get_batch_data(dataset, batch_size):
     # data_queues = tf.train.slice_input_producer([trX, trY])
     tensor_list = [trX, trY]
     input_tensor = tf.keras.Input(shape=(57575, 86, 86, 3))
-    tf_dataset = tf.data.Dataset.from_tensor_slices((trX, trY)).shuffle(buffer_size=50000).batch(batch_size, drop_remainder=True).repeat()
+    tf_dataset = tf.data.Dataset.from_tensor_slices((trX, trY)).repeat().shuffle(batch_size * 32).batch(batch_size, drop_remainder=True)
 
     iter = tf_dataset.make_one_shot_iterator()
     X, Y = iter.get_next()
