@@ -34,7 +34,7 @@ class CapsNet(object):
 
         with self.graph.as_default():
             if is_training:
-                self.X, self.labels = get_batch_data(cfg.dataset, cfg.batch_size, cfg.num_threads)
+                self.X, self.labels = get_batch_data(cfg.dataset, cfg.batch_size)
                 self.Y = tf.one_hot(self.labels, depth=self.num_label, axis=1, dtype=tf.float32)
 
                 self.build_arch()

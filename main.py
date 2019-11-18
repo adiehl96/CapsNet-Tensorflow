@@ -53,7 +53,7 @@ def train(model, supervisor, num_label):
         for epoch in range(cfg.epoch):
             print("Training for epoch %d/%d:" % (epoch, cfg.epoch))
             if supervisor.should_stop():
-                print('supervisor stoped!')
+                print('supervisor stopped!')
                 break
             for step in tqdm(range(num_tr_batch), total=num_tr_batch, ncols=70, leave=False, unit='b'):
                 start = step * cfg.batch_size

@@ -109,22 +109,27 @@ def load_data(dataset, batch_size, is_training=True, one_hot=False):
         raise Exception('Invalid dataset, please check the name of dataset:', dataset)
 
 
-def get_batch_data(dataset, batch_size, num_threads):
+def get_batch_data(dataset, batch_size):
     if dataset == 'mnist':
         trX, trY, num_tr_batch, valX, valY, num_val_batch = load_mnist(batch_size, is_training=True)
     if dataset == 'faceset':
         trX, trY, num_tr_batch, valX, valY, num_val_batch = load_face_set(batch_size, is_training=True)
     elif dataset == 'fashion-mnist':
         trX, trY, num_tr_batch, valX, valY, num_val_batch = load_fashion_mnist(batch_size, is_training=True)
-    data_queues = tf.train.slice_input_producer([trX, trY])
-    X, Y = tf.train.shuffle_batch(data_queues, num_threads=num_threads,
-                                  batch_size=batch_size,
-                                  capacity=batch_size * 64,
-                                  min_after_dequeue=batch_size * 32,
-                                  allow_smaller_final_batch=False)
+    # data_queues = tf.train.slice_input_producer([trX, trY])
+    tensor_list = [trX, trY]
+    input_tensor = tf.keras.Input(shape=(57575, 86, 86, 3))
+    tf_dataset = tf.data.Dataset.from_tensor_slices((trX, trY)).shuffle(buffer_size=50000).repeat()
+    iter = tf_dataset.make_one_shot_iterator()
+    X, Y = iter.get_next()
+
+    # X, Y = tf.train.shuffle_batch(data_queues, num_threads=num_threads,
+    #                               batch_size=batch_size,
+    #                               capacity=batch_size * 64,
+    #                               min_after_dequeue=batch_size * 32,
+    #                               allow_smaller_final_batch=False)
 
     return(X, Y)
-
 
 def save_images(imgs, size, path):
     '''
