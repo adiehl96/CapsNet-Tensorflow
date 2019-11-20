@@ -117,9 +117,13 @@ def get_batch_data(dataset, batch_size):
     elif dataset == 'fashion-mnist':
         trX, trY, num_tr_batch, valX, valY, num_val_batch = load_fashion_mnist(batch_size, is_training=True)
     # data_queues = tf.train.slice_input_producer([trX, trY])
-    tensor_list = [trX, trY]
-    input_tensor = tf.keras.Input(shape=(57575, 86, 86, 3))
-    tf_dataset = tf.data.Dataset.from_tensor_slices((trX, trY)).repeat().shuffle(batch_size * 32).batch(batch_size, drop_remainder=True)
+
+    def generator():
+        for e1, e2 in zip(trX, trY):
+            yield e1, e2
+
+    tf_dataset = tf.data.Dataset.from_generator(generator, output_types=(tf.float32, tf.float32)).repeat().shuffle(batch_size * 32).batch(batch_size, drop_remainder=True)
+    # tf_dataset = tf.data.Dataset.from_tensor_slices((trX, trY)).repeat().shuffle(batch_size * 32).batch(batch_size, drop_remainder=True)
 
     iter = tf_dataset.make_one_shot_iterator()
     (X, Y) = iter.get_next()
