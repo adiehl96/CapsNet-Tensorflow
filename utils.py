@@ -122,7 +122,7 @@ def get_batch_data(dataset, batch_size):
     tf_dataset = tf.data.Dataset.from_tensor_slices((trX, trY)).repeat().shuffle(batch_size * 32).batch(batch_size, drop_remainder=True)
 
     iter = tf_dataset.make_one_shot_iterator()
-    X, Y = iter.get_next()
+    (X, Y) = iter.get_next()
 
     # X, Y = tf.train.shuffle_batch(data_queues, num_threads=num_threads,
     #                               batch_size=batch_size,
@@ -130,7 +130,7 @@ def get_batch_data(dataset, batch_size):
     #                               min_after_dequeue=batch_size * 32,
     #                               allow_smaller_final_batch=False)
 
-    return(X, Y)
+    return X, Y
 
 def save_images(imgs, size, path):
     '''

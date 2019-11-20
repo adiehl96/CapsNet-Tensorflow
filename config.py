@@ -33,7 +33,10 @@ flags.DEFINE_integer('train_sum_freq', 100, 'the frequency of saving train summa
 flags.DEFINE_integer('val_sum_freq', 500, 'the frequency of saving valuation summary(step)')
 flags.DEFINE_integer('save_freq', 3, 'the frequency of saving model(epoch)')
 flags.DEFINE_string('results', 'results', 'path for saving results')
-
+flags.DEFINE_integer('sample_height', 28, 'the height of a single input sample')
+flags.DEFINE_integer('sample_width', 28, 'the width of a single input sample')
+flags.DEFINE_integer('sample_channel', 1, 'the amount of channels a single input sample has')
+flags.DEFINE_integer('amount_label', 10, 'the amount of labels present in the dataset')
 ############################
 #   distributed setting    #
 ############################

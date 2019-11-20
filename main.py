@@ -118,7 +118,8 @@ def evaluation(model, supervisor, num_label):
 def main(_):
     tf.logging.info(' Loading Graph...')
     num_label = 10
-    model = CapsNet(height=86, width=86, channels=3, num_label=2)
+    model = CapsNet(height=cfg.sample_height, width=cfg.sample_width,  channels=cfg.sample_channel,
+                    num_label=cfg.amount_label)
     tf.logging.info(' Graph loaded')
 
     sv = tf.train.Supervisor(graph=model.graph, logdir=cfg.logdir, save_model_secs=0)
