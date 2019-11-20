@@ -122,7 +122,7 @@ def get_batch_data(dataset, batch_size):
         for e1, e2 in zip(trX, trY):
             yield e1, e2
 
-    tf_dataset = tf.data.Dataset.from_generator(generator, output_types=(tf.float32, tf.float32)).repeat().shuffle(batch_size * 32).batch(batch_size, drop_remainder=True)
+    tf_dataset = tf.data.Dataset.from_generator(generator, output_types=(tf.int32, tf.int32)).repeat().shuffle(batch_size * 32).batch(batch_size, drop_remainder=True)
     # tf_dataset = tf.data.Dataset.from_tensor_slices((trX, trY)).repeat().shuffle(batch_size * 32).batch(batch_size, drop_remainder=True)
 
     iter = tf_dataset.make_one_shot_iterator()
