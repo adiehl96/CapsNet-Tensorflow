@@ -116,19 +116,12 @@ def get_batch_data(dataset, batch_size):
         trX, trY, num_tr_batch, valX, valY, num_val_batch = load_face_set(batch_size, is_training=True)
     elif dataset == 'fashion-mnist':
         trX, trY, num_tr_batch, valX, valY, num_val_batch = load_fashion_mnist(batch_size, is_training=True)
-    # data_queues = tf.train.slice_input_producer([trX, trY])
 
     def generator():
-        print(trX.shape)
-        x=0
         for e1, e2 in zip(trX, trY):
-            # if(x>n):
             yield e1, e2
-            # else:
-            #     break;
-            x=x+1
 
-    tf_dataset = tf.data.Dataset.from_generator(generator, output_types=(tf.float32, tf.int32), output_shapes=(tf.TensorShape(list(trX[0][0].shape)), tf.TensorShape([1]))).repeat().shuffle(batch_size * 32).batch(batch_size=batch_size, drop_remainder=True)
+    tf_dataset = tf.data.Dataset.from_generator(generator, output_types=(tf.float32, tf.int32), output_shapes=(tf.TensorShape(list(trX[0].shape)), tf.TensorShape([1]))).repeat().shuffle(batch_size * 32).batch(batch_size=batch_size, drop_remainder=True)
     # tf_dataset = tf.data.Dataset.from_tensor_slices((trX, trY)).repeat().shuffle(batch_size * 32).batch(batch_size, drop_remainder=True)
 
     iterator = tf_dataset.make_one_shot_iterator()
