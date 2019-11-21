@@ -83,7 +83,7 @@ def main(_):
 
         num_batches_per_epoch = int(60000/(cfg.batch_size_per_gpu*cfg.num_gpu))
 
-        opt = tf.train.AdamOptimizer()
+        opt = tf.compat.v1.train.AdamOptimizer()
 
         batch_x, batch_labels = create_inputs()
         batch_y = tf.one_hot(batch_labels, depth=10, axis=1, dtype=tf.float32)

@@ -43,7 +43,7 @@ class CapsNet(object):
 
                 # t_vars = tf.trainable_variables()
                 self.global_step = tf.Variable(0, name='global_step', trainable=False)
-                self.optimizer = tf.train.AdamOptimizer()
+                self.optimizer = tf.compat.v1.train.AdamOptimizer()
                 self.train_op = self.optimizer.minimize(self.total_loss, global_step=self.global_step)
             else:
                 self.X = tf.placeholder(tf.float32, shape=(cfg.batch_size, self.height, self.width, self.channels))
@@ -51,7 +51,7 @@ class CapsNet(object):
                 self.Y = tf.reshape(self.labels, shape=(cfg.batch_size, self.num_label, 1))
                 self.build_arch()
 
-        tf.logging.info('Seting up the main structure')
+        tf.logging.info('Setting up the main structure')
 
     def build_arch(self):
         with tf.variable_scope('Conv1_layer'):
@@ -154,7 +154,7 @@ class CapsNet(object):
         train_summary.append(tf.summary.scalar('train/reconstruction_loss', self.reconstruction_err))
         train_summary.append(tf.summary.scalar('train/total_loss', self.total_loss))
         recon_img = tf.reshape(self.decoded, shape=(cfg.batch_size, self.height, self.width, self.channels))
-        train_summary.append(tf.summary.image('reconstruction_img', recon_img))
+        train_summary.append(tf.compat.v1.summary.image('reconstruction_img', recon_img))
         self.train_summary = tf.summary.merge(train_summary)
 
         correct_prediction = tf.equal(tf.to_int32(self.labels), self.argmax_idx)

@@ -42,13 +42,17 @@ def save_to():
 
 def train(model, supervisor, num_label):
     trX, trY, num_tr_batch, valX, valY, num_val_batch = load_data(cfg.dataset, cfg.batch_size, is_training=True)
-    Y = valY[:num_val_batch * cfg.batch_size].reshape((-1, 1))
+    # Y = valY[:num_val_batch * cfg.batch_size].reshape((-1, 1))
+
+    print('Dataset Loaded!')
 
     fd_train_acc, fd_loss, fd_val_acc = save_to()
-    config = tf.ConfigProto()
+    config = tf.compat.v1.ConfigProto()
     config.gpu_options.allow_growth = True
 
+    print('Config Set')
     with supervisor.managed_session(config=config) as sess:
+        print('Session opened')
         print("\nNote: all of results will be saved to directory: " + cfg.results)
         for epoch in range(cfg.epoch):
             print("Training for epoch %d/%d:" % (epoch, cfg.epoch))
