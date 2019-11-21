@@ -99,9 +99,9 @@ def routing(input, b_IJ, num_outputs=10, num_dims=16):
 
     # W: [1, num_caps_i, num_caps_j * len_v_j, len_u_j, 1]
     input_shape = get_shape(input)
-    W = tf.get_variable('Weight', shape=[1, input_shape[1], num_dims * num_outputs] + input_shape[-2:],
+    W = tf.compat.v1.get_variable('Weight', shape=[1, input_shape[1], num_dims * num_outputs] + input_shape[-2:],
                         dtype=tf.float32, initializer=tf.random_normal_initializer(stddev=cfg.stddev))
-    biases = tf.get_variable('bias', shape=(1, 1, num_outputs, num_dims, 1))
+    biases = tf.compat.v1.get_variable('bias', shape=(1, 1, num_outputs, num_dims, 1))
 
     # Eq.2, calc u_hat
     # Since tf.matmul is a time-consuming op,

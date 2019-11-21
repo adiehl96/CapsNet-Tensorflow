@@ -124,7 +124,8 @@ def get_batch_data(dataset, batch_size):
     tf_dataset = tf.data.Dataset.from_generator(generator, output_types=(tf.float32, tf.int32), output_shapes=(tf.TensorShape(list(trX[0].shape)), ())).repeat().shuffle(batch_size * 32).batch(batch_size=batch_size, drop_remainder=True)
     # tf_dataset = tf.data.Dataset.from_tensor_slices((trX, trY)).repeat().shuffle(batch_size * 32).batch(batch_size, drop_remainder=True)
 
-    iterator = tf_dataset.make_one_shot_iterator()
+    # iterator = tf_dataset.make_one_shot_iterator()
+    iterator = tf.compat.v1.data.make_one_shot_iterator(tf_dataset)
     (X, Y) = iterator.get_next()
     # Y=tf.reshape(Y, tf.TensorShape(batch_size))
 
