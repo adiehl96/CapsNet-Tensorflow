@@ -86,6 +86,11 @@ def load_face_set(batch_size, is_training=True):
         loaded = pickle.load(fd)
         trainY = loaded.reshape((57575)).astype(np.int32)
 
+        data_set = list(zip(trainX,trainY))
+        np.random.shuffle(data_set)
+        trainX, trainY = list(zip(*data_set))
+        trainX = np.asarray(trainX).reshape((57575, 86, 86, 3)).astype(np.float32)
+        trainY = np.asarray(trainY).reshape((57575)).astype(np.int32)
         trX = trainX[:52000] / 255.
         trY = trainY[:52000]
 
