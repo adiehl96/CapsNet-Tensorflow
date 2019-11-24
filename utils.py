@@ -101,7 +101,17 @@ def load_face_set(batch_size, is_training=True):
         num_val_batch = 5575 // batch_size
 
         return trX, trY, num_tr_batch, valX, valY, num_val_batch
+    else:
+        fd = open(os.path.join(path, 'faceseteval'), 'rb')
+        loaded = pickle.load(fd)
+        trainX = loaded.reshape((10000, 86, 86, 3)).astype(np.float32)
 
+        fd = open(os.path.join(path, 'facesetevalcat'), 'rb')
+        loaded = pickle.load(fd)
+        trainY = loaded.reshape((10000)).astype(np.int32)
+
+        num_te_batch = 10000 // batch_size
+        return trainX / 255., trainY, num_te_batch
 
 def load_data(dataset, batch_size, is_training=True, one_hot=False):
     if dataset == 'mnist':
