@@ -83,7 +83,7 @@ def train(model, supervisor, num_label):
                         end = start + cfg.batch_size
                         acc, argmax = sess.run([model.accuracy, model.argmax_idx], {model.X: valX[start:end], model.labels: valY[start:end]})
                         val_acc += acc
-                        print("Argmax is now: " + str(argmax))
+                        # print("Argmax is now: " + str(argmax))
                     val_acc = val_acc / (cfg.batch_size * num_val_batch)
                     fd_val_acc.write(str(global_step) + ',' + str(val_acc) + '\n')
                     fd_val_acc.flush()
