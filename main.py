@@ -81,8 +81,9 @@ def train(model, supervisor, num_label):
                     for i in range(num_val_batch):
                         start = i * cfg.batch_size
                         end = start + cfg.batch_size
-                        acc = sess.run(model.accuracy, {model.X: valX[start:end], model.labels: valY[start:end]})
+                        acc, argmax = sess.run([model.accuracy, model.argmax_idx], {model.X: valX[start:end], model.labels: valY[start:end]})
                         val_acc += acc
+                        print("Argmax is now: " + str(argmax))
                     val_acc = val_acc / (cfg.batch_size * num_val_batch)
                     fd_val_acc.write(str(global_step) + ',' + str(val_acc) + '\n')
                     fd_val_acc.flush()
@@ -100,7 +101,7 @@ def evaluation(model, supervisor, num_label):
     fd_test_acc = save_to()
     config = tf.ConfigProto(
         allow_soft_placement=True,
-        device_count={'GPU': 0}
+        # device_count={'GPU': 0}
     )
     config.gpu_options.allow_growth = True
     with supervisor.managed_session(config=config) as sess:
@@ -113,6 +114,7 @@ def evaluation(model, supervisor, num_label):
             end = start + cfg.batch_size
             acc = sess.run(model.accuracy, {model.X: teX[start:end], model.labels: teY[start:end]})
             test_acc += acc
+            print("Test acc is now: " + str(test_acc))
         test_acc = test_acc / (cfg.batch_size * num_te_batch)
         fd_test_acc.write(str(test_acc))
         fd_test_acc.close()
