@@ -156,7 +156,7 @@ def routing(input, b_IJ, num_outputs=10, num_dims=16):
                 # b_IJ += tf.reduce_sum(u_produce_v, axis=0, keep_dims=True)
                 b_IJ += u_produce_v
 
-    return(v_J)
+    return v_J
 
 
 def squash(vector):
@@ -169,4 +169,4 @@ def squash(vector):
     vec_squared_norm = reduce_sum(tf.square(vector), -2, keepdims=True)
     scalar_factor = vec_squared_norm / (1 + vec_squared_norm) / tf.sqrt(vec_squared_norm + epsilon)
     vec_squashed = scalar_factor * vector  # element-wise
-    return(vec_squashed)
+    return vec_squashed
