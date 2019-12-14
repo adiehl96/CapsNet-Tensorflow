@@ -3,6 +3,11 @@ import scipy
 import numpy as np
 import tensorflow as tf
 import pickle
+from skimage.transform import rotate, resize
+from skimage import exposure
+import skimage.io as io
+
+from config import cfg
 
 
 def load_mnist(batch_size, is_training=True):
@@ -115,15 +120,15 @@ def load_face_set(batch_size, is_training=True):
 
 
 def load_facegreyredux_set(batch_size, is_training=True):
-    path = os.path.join('data', 'facesetgreyredux')
+    path = os.path.join('data', 'facegreyredux')
     if is_training:
-        fd = open(os.path.join(path, 'facesetgreyredux'), 'rb')
+        fd = open(os.path.join(path, 'facegreyredux'), 'rb')
         # loaded = np.fromfile(file=fd, dtype=np.uint8)
         loaded = pickle.load(fd)
         loaded = np.asarray(loaded)
         trainX = loaded.reshape((57575, 28, 28, 1)).astype(np.float32)
 
-        fd = open(os.path.join(path, 'categories'), 'rb')
+        fd = open(os.path.join(path, 'facegreyreduxcat'), 'rb')
         # loaded = np.fromfile(file=fd, dtype=np.uint8)
         loaded = pickle.load(fd)
         trainY = loaded.reshape((57575)).astype(np.int32)
@@ -144,17 +149,30 @@ def load_facegreyredux_set(batch_size, is_training=True):
 
         return trX, trY, num_tr_batch, valX, valY, num_val_batch
     else:
-        fd = open(os.path.join(path, 'facesetgreyreduxeval'), 'rb')
+        fd = open(os.path.join(path, 'facegreyreduxeval'), 'rb')
         loaded = pickle.load(fd)
         loaded = np.asarray(loaded)
-        trainX = loaded.reshape((10000, 28, 28, 1)).astype(np.float32)
+        trainX = loaded.reshape((10000, 28, 28, 1)).astype(np.float32) / 255.
 
-        fd = open(os.path.join(path, 'facesetevalcat'), 'rb')
+        fd = open(os.path.join(path, 'facegreyreduxevalcat'), 'rb')
         loaded = pickle.load(fd)
         trainY = loaded.reshape((10000)).astype(np.int32)
 
+        rotatedlist = []
+        for image in trainX:
+            image = rotate(image, cfg.rotation, preserve_range=True)
+            if(cfg.mooney):
+                v_min, v_max = np.percentile(image, (49.99999999, 51))
+                image = exposure.rescale_intensity(image, in_range=(v_min, v_max))
+            rotatedlist.append(image)
+            if(len(rotatedlist)==1000):
+                I = resize(image.reshape(28, 28), (128, 128))
+                io.imsave("rotate" + str(cfg.rotation) +  "example.jpg", I, cmap='gray')
+        rotatedlist = np.asarray(rotatedlist)
+        trainX = rotatedlist.reshape((10000, 28, 28, 1)).astype(np.float32)
+
         num_te_batch = 10000 // batch_size
-        return trainX / 255., trainY, num_te_batch
+        return trainX, trainY, num_te_batch
 
 
 def load_facegreyreduxshuffled_set(batch_size, is_training=True):

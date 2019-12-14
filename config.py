@@ -44,5 +44,13 @@ flags.DEFINE_integer('num_gpu', 2, 'number of gpus for distributed training')
 flags.DEFINE_integer('batch_size_per_gpu', 128, 'batch size on 1 gpu')
 flags.DEFINE_integer('thread_per_gpu', 4, 'Number of preprocessing threads per tower.')
 
+#------------------------------------------------------------------------------
+# Experiment SETTINGS
+#------------------------------------------------------------------------------
+flags.DEFINE_integer('rotation', 0, 'Number of degrees the test set is rotated by')
+flags.DEFINE_boolean('mooney', False, 'Converts the test set to fake mooney faces')
+flags.DEFINE_boolean('flickr', False, 'Whether or not to use the flickr face set for testing')
+
+
 cfg = tf.app.flags.FLAGS
 # tf.logging.set_verbosity(tf.logging.INFO)
