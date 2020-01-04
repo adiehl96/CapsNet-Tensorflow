@@ -7,6 +7,7 @@ from tqdm import tqdm
 from config import cfg
 from utils import load_data
 from capsNet import CapsNet
+from sklearn.metrics import classification_report
 
 
 def save_to():
@@ -109,12 +110,17 @@ def evaluation(model, supervisor, num_label):
         tf.logging.info('Model restored!')
 
         test_acc = 0
+        test_labels = []
         for i in tqdm(range(num_te_batch), total=num_te_batch, ncols=70, leave=False, unit='b'):
             start = i * cfg.batch_size
             end = start + cfg.batch_size
-            acc = sess.run(model.accuracy, {model.X: teX[start:end], model.labels: teY[start:end]})
+            acc, labels = sess.run([model.accuracy, model.argmax_idx], {model.X: teX[start:end], model.labels: teY[start:end]})
             test_acc += acc
+            test_labels += list(labels)
             print("Test acc is now: " + str(test_acc))
+        # print("Test acc is now: " + str(len(test_labels)))
+        # print("Test acc is now: " + str(len(teY)))
+        print(classification_report(teY, test_labels))
         test_acc = test_acc / (cfg.batch_size * num_te_batch)
         fd_test_acc.write(str(test_acc))
         fd_test_acc.close()

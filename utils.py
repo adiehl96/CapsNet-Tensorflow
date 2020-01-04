@@ -176,6 +176,63 @@ def load_facegreyredux_set(batch_size, is_training=True):
         return trainX, trainY, num_te_batch
 
 
+def load_facecargreyredux_set(batch_size, is_training=True):
+    path = os.path.join('data', 'facecargreyredux')
+    if is_training:
+        fd = open(os.path.join(path, 'facecargreyredux'), 'rb')
+        # loaded = np.fromfile(file=fd, dtype=np.uint8)
+        loaded = pickle.load(fd)
+        loaded = np.asarray(loaded)
+        trainX = loaded.reshape((75000, 28, 28, 1)).astype(np.float32)
+
+        fd = open(os.path.join(path, 'facecargreyreduxcat'), 'rb')
+        # loaded = np.fromfile(file=fd, dtype=np.uint8)
+        loaded = pickle.load(fd)
+        loaded = np.asarray(loaded)
+        trainY = loaded.reshape((75000)).astype(np.int32)
+
+        data_set = list(zip(trainX,trainY))
+        np.random.shuffle(data_set)
+        trainX, trainY = list(zip(*data_set))
+        trainX = np.asarray(trainX).reshape((75000, 28, 28, 1)).astype(np.float32)
+        trainY = np.asarray(trainY).reshape((75000)).astype(np.int32)
+        trX = trainX[:65000] / 255.
+        trY = trainY[:65000]
+
+        valX = trainX[65000:, ] / 255.
+        valY = trainY[65000:]
+
+        num_tr_batch = 65000 // batch_size
+        num_val_batch = 10000 // batch_size
+
+        return trX, trY, num_tr_batch, valX, valY, num_val_batch
+    else:
+        fd = open(os.path.join(path, 'facecargreyreduxeval'), 'rb')
+        loaded = pickle.load(fd)
+        loaded = np.asarray(loaded)
+        trainX = loaded.reshape((15000, 28, 28, 1)).astype(np.float32) / 255.
+
+        fd = open(os.path.join(path, 'facecargreyreduxevalcat'), 'rb')
+        loaded = pickle.load(fd)
+        trainY = loaded.reshape((15000)).astype(np.int32)
+
+        rotatedlist = []
+        for image in trainX:
+            image = rotate(image, cfg.rotation, preserve_range=True)
+            if(cfg.mooney):
+                v_min, v_max = np.percentile(image, (49.99999999, 51))
+                image = exposure.rescale_intensity(image, in_range=(v_min, v_max))
+            rotatedlist.append(image)
+            if(len(rotatedlist)==1000):
+                I = resize(image.reshape(28, 28), (128, 128))
+                io.imsave("rotate" + str(cfg.rotation) +  "example.jpg", I, cmap='gray')
+        rotatedlist = np.asarray(rotatedlist)
+        trainX = rotatedlist.reshape((15000, 28, 28, 1)).astype(np.float32)
+
+        num_te_batch = 15000 // batch_size
+        return trainX, trainY, num_te_batch
+
+
 def load_data(dataset, batch_size, is_training=True, one_hot=False):
     if dataset == 'mnist':
         return load_mnist(batch_size, is_training)
@@ -185,6 +242,8 @@ def load_data(dataset, batch_size, is_training=True, one_hot=False):
         return load_face_set(batch_size, is_training)
     elif dataset == 'facegreyredux':
         return load_facegreyredux_set(batch_size, is_training)
+    elif dataset == 'facecargreyredux':
+        return load_facecargreyredux_set(batch_size, is_training)
     else:
         raise Exception('Invalid dataset, please check the name of dataset:', dataset)
 
@@ -198,6 +257,8 @@ def get_batch_data(dataset, batch_size):
         trX, trY, num_tr_batch, valX, valY, num_val_batch = load_fashion_mnist(batch_size, is_training=True)
     elif dataset == 'facegreyredux':
         trX, trY, num_tr_batch, valX, valY, num_val_batch = load_facegreyredux_set(batch_size, is_training=True)
+    elif dataset == 'facecargreyredux':
+        trX, trY, num_tr_batch, valX, valY, num_val_batch = load_facecargreyredux_set(batch_size, is_training=True)
 
     def generator():
         for e1, e2 in zip(trX, trY):
