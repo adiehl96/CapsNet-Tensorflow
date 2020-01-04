@@ -126,26 +126,27 @@ def load_facegreyredux_set(batch_size, is_training=True):
         # loaded = np.fromfile(file=fd, dtype=np.uint8)
         loaded = pickle.load(fd)
         loaded = np.asarray(loaded)
-        trainX = loaded.reshape((57575, 28, 28, 1)).astype(np.float32)
+        trainX = loaded.reshape((50000, 28, 28, 1)).astype(np.float32)
 
         fd = open(os.path.join(path, 'facegreyreduxcat'), 'rb')
         # loaded = np.fromfile(file=fd, dtype=np.uint8)
         loaded = pickle.load(fd)
-        trainY = loaded.reshape((57575)).astype(np.int32)
+        loaded = np.asarray(loaded)
+        trainY = loaded.reshape((50000)).astype(np.int32)
 
         data_set = list(zip(trainX,trainY))
         np.random.shuffle(data_set)
         trainX, trainY = list(zip(*data_set))
-        trainX = np.asarray(trainX).reshape((57575, 28, 28, 1)).astype(np.float32)
-        trainY = np.asarray(trainY).reshape((57575)).astype(np.int32)
-        trX = trainX[:52000] / 255.
-        trY = trainY[:52000]
+        trainX = np.asarray(trainX).reshape((50000, 28, 28, 1)).astype(np.float32)
+        trainY = np.asarray(trainY).reshape((50000)).astype(np.int32)
+        trX = trainX[:40000] / 255.
+        trY = trainY[:40000]
 
-        valX = trainX[52000:, ] / 255.
-        valY = trainY[52000:]
+        valX = trainX[40000:, ] / 255.
+        valY = trainY[40000:]
 
-        num_tr_batch = 52000 // batch_size
-        num_val_batch = 5575 // batch_size
+        num_tr_batch = 40000 // batch_size
+        num_val_batch = 10000 // batch_size
 
         return trX, trY, num_tr_batch, valX, valY, num_val_batch
     else:
@@ -175,51 +176,6 @@ def load_facegreyredux_set(batch_size, is_training=True):
         return trainX, trainY, num_te_batch
 
 
-def load_facegreyreduxshuffled_set(batch_size, is_training=True):
-    path = os.path.join('data', 'facegreyreduxshuffled')
-    if is_training:
-        fd = open(os.path.join(path, 'facegreyreduxshuffled'), 'rb')
-        # loaded = np.fromfile(file=fd, dtype=np.uint8)
-        loaded = pickle.load(fd)
-        loaded = np.asarray(loaded)
-        trainX = loaded.reshape((57575, 28, 28, 1)).astype(np.float32)
-
-        fd = open(os.path.join(path, 'catshuffled'), 'rb')
-        # loaded = np.fromfile(file=fd, dtype=np.uint8)
-        loaded = pickle.load(fd)
-        loaded = np.asarray(loaded)
-        trainY = loaded.reshape((57575)).astype(np.int32)
-
-        data_set = list(zip(trainX,trainY))
-        np.random.shuffle(data_set)
-        trainX, trainY = list(zip(*data_set))
-        trainX = np.asarray(trainX).reshape((57575, 28, 28, 1)).astype(np.float32)
-        trainY = np.asarray(trainY).reshape((57575)).astype(np.int32)
-        trX = trainX[:52000] / 255.
-        trY = trainY[:52000]
-
-        valX = trainX[52000:, ] / 255.
-        valY = trainY[52000:]
-
-        num_tr_batch = 52000 // batch_size
-        num_val_batch = 5575 // batch_size
-
-        return trX, trY, num_tr_batch, valX, valY, num_val_batch
-    else:
-        fd = open(os.path.join(path, 'facegreyreduxevalshuffled'), 'rb')
-        loaded = pickle.load(fd)
-        loaded = np.asarray(loaded)
-        trainX = loaded.reshape((10000, 28, 28, 1)).astype(np.float32)
-
-        fd = open(os.path.join(path, 'catevalshuffled'), 'rb')
-        loaded = pickle.load(fd)
-        loaded = np.asarray(loaded)
-        trainY = loaded.reshape((10000)).astype(np.int32)
-
-        num_te_batch = 10000 // batch_size
-        return trainX / 255., trainY, num_te_batch
-
-
 def load_data(dataset, batch_size, is_training=True, one_hot=False):
     if dataset == 'mnist':
         return load_mnist(batch_size, is_training)
@@ -229,8 +185,6 @@ def load_data(dataset, batch_size, is_training=True, one_hot=False):
         return load_face_set(batch_size, is_training)
     elif dataset == 'facegreyredux':
         return load_facegreyredux_set(batch_size, is_training)
-    elif dataset == 'facegreyreduxshuffled':
-        return load_facegreyreduxshuffled_set(batch_size, is_training)
     else:
         raise Exception('Invalid dataset, please check the name of dataset:', dataset)
 
@@ -244,8 +198,6 @@ def get_batch_data(dataset, batch_size):
         trX, trY, num_tr_batch, valX, valY, num_val_batch = load_fashion_mnist(batch_size, is_training=True)
     elif dataset == 'facegreyredux':
         trX, trY, num_tr_batch, valX, valY, num_val_batch = load_facegreyredux_set(batch_size, is_training=True)
-    elif dataset == 'facegreyreduxshuffled':
-        trX, trY, num_tr_batch, valX, valY, num_val_batch = load_facegreyreduxshuffled_set(batch_size, is_training=True)
 
     def generator():
         for e1, e2 in zip(trX, trY):
